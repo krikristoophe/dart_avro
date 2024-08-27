@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Pure dart implementation
+
+## 0.0.2
+
+* Add github action
