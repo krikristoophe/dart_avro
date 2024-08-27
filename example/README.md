@@ -1,6 +1,6 @@
-# flutter_avro_example
+# dart_avro_example
 
-Demonstrates how to use the flutter_avro plugin.
+Demonstrates how to use the dart_avro plugin.
 
 ## Getting Started
 

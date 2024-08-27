@@ -5,18 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "flutter_avro",
+      "name": "dart_avro",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "flutter_avro (profile mode)",
+      "name": "dart_avro (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "flutter_avro (release mode)",
+      "name": "dart_avro (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"

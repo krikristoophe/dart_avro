@@ -1,15 +1,33 @@
-# flutter_avro
+# dart_avro
 
-A new Flutter plugin project.
+A pure dart package to decode avro encoding
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+```dart
+final Uint8List data  = Uint8List.fromList([0x04]);
+final Map<String, dynamic> schema = {
+  'type': 'int',
+};
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+final int decoded = DartAvro.decodeJson(schema, data);
+```
 
+## Types
+
+| avro type | dart type |
+|:----:|:----:|
+| null | null |
+| boolean | bool |
+| int, long | int |
+| double, float | double |
+| bytes, fixed | Uint8List |
+| string | String |
+| record, map | Map<String, dynamic> |
+| enum | string |
+| array | List<dynamic> |
+
+## TODO
+
+- Encoding
+- Model generation

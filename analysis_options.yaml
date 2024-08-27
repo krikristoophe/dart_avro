@@ -1,4 +1,10 @@
-include: package:flutter_lints/flutter.yaml
+include: package:very_good_analysis/analysis_options.yaml
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+linter:
+  rules:
+    unnecessary_lambdas: false
+    omit_local_variable_types: false
+    prefer_void_to_null: false

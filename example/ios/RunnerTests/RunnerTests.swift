@@ -3,7 +3,7 @@ import UIKit
 import XCTest
 
 
-@testable import flutter_avro
+@testable import dart_avro
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
 //
