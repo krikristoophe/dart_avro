@@ -30,6 +30,11 @@ class Schema {
   dynamic decode(Uint8List data) {
     return type.decode(DataBuffer(data.buffer));
   }
+
+  /// Encode payload with current schema
+  Uint8List encode(dynamic payload) {
+    return type.encode(payload);
+  }
 }
 
 // TODO(c): manage alias
@@ -123,6 +128,14 @@ abstract class AvroType<T> {
 
   /// Decode data for current type
   T decode(DataBuffer data);
+
+  /// Encode payload for current type
+  Uint8List encode(T payload);
+
+  /// Is payload of current type
+  bool isType(dynamic payload) {
+    return payload is T;
+  }
 }
 
 /// abstract named avro type

@@ -17,4 +17,18 @@ class DartAvro {
 
     return sch.decode(data);
   }
+
+  /// Encode payload to avro encoded data from schema
+  static Uint8List encode(String schema, dynamic data) {
+    final Schema sch = Schema.parse(schema);
+
+    return sch.encode(data);
+  }
+
+  /// Encode payload to avro encoded data from schema
+  static Uint8List encodeJson(Map<String, dynamic> schema, dynamic data) {
+    final Schema sch = Schema.fromJson(schema);
+
+    return sch.encode(data);
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:dart_avro/schema/primitive_types.dart';
 import 'package:dart_avro/schema/schema.dart';
 import 'package:dart_avro/utils/data_buffer.dart';
 
@@ -14,7 +15,7 @@ class RecordType extends NamedType<Map<String, dynamic>> {
     required this.fields,
   });
 
-  ///
+  /// Create record from json schema
   factory RecordType.fromJson(Map<String, dynamic> json) {
     if (json['name'] == null) {
       throw Exception('No name found for record');
@@ -46,6 +47,20 @@ class RecordType extends NamedType<Map<String, dynamic>> {
 
     return result;
   }
+
+  @override
+  Uint8List encode(Map<String, dynamic> payload) {
+    Uint8List result = Uint8List(0);
+
+    for (final field in fields) {
+      result = Uint8List.fromList([
+        ...result,
+        ...field.type.encode(payload[field.name]),
+      ]);
+    }
+
+    return result;
+  }
 }
 
 /// Field for record schema
@@ -59,7 +74,7 @@ class RecordField {
     required this.aliases,
   });
 
-  ///
+  /// Create record field from json schema
   factory RecordField.fromJson(Map<String, dynamic> json) {
     return RecordField(
       name: json['name'] as String,
@@ -96,7 +111,7 @@ class EnumType extends NamedType<String> {
     required this.symbols,
   });
 
-  ///
+  /// Create enum from json schema
   factory EnumType.fromJson(Map<String, dynamic> json) {
     return EnumType(
       name: json['name'] as String,
@@ -118,6 +133,11 @@ class EnumType extends NamedType<String> {
     final int index = data.readLong();
     return symbols[index];
   }
+
+  @override
+  Uint8List encode(String payload) {
+    return IntType.encodeLong(symbols.indexOf(payload));
+  }
 }
 
 /// Fixed avro type
@@ -130,7 +150,7 @@ class FixedType extends NamedType<Uint8List> {
     required this.size,
   });
 
-  ///
+  /// Create fixed from json schema
   factory FixedType.fromJson(Map<String, dynamic> json) {
     return FixedType(
       name: json['name'] as String,
@@ -147,6 +167,11 @@ class FixedType extends NamedType<Uint8List> {
   Uint8List decode(DataBuffer data) {
     return data.next(size);
   }
+
+  @override
+  Uint8List encode(Uint8List payload) {
+    return payload;
+  }
 }
 
 /// Array avro type
@@ -156,7 +181,7 @@ class ArrayType extends AvroType<List<dynamic>> {
     required this.items,
   });
 
-  ///
+  /// Create array from json schema
   factory ArrayType.fromJson(Map<String, dynamic> json) {
     return ArrayType(
       items: AvroType.fromDynamic(json['items']),
@@ -182,6 +207,23 @@ class ArrayType extends AvroType<List<dynamic>> {
     } while (blockCount > 0);
     return result;
   }
+
+  @override
+  Uint8List encode(List<dynamic> payload) {
+    Uint8List result = Uint8List.fromList(IntType.encodeLong(payload.length));
+
+    for (final item in payload) {
+      result = Uint8List.fromList([
+        ...result,
+        ...items.encode(item),
+      ]);
+    }
+
+    return Uint8List.fromList([
+      ...result,
+      ...IntType.encodeLong(0),
+    ]);
+  }
 }
 
 /// Map avro type
@@ -191,7 +233,7 @@ class MapType extends AvroType<Map<String, dynamic>> {
     required this.values,
   });
 
-  ///
+  /// Create map from json schema
   factory MapType.fromJson(Map<String, dynamic> json) {
     return MapType(
       values: AvroType.fromDynamic(json['values']),
@@ -221,6 +263,26 @@ class MapType extends AvroType<Map<String, dynamic>> {
 
     return result;
   }
+
+  @override
+  Uint8List encode(Map<String, dynamic> payload) {
+    Uint8List result = Uint8List.fromList(
+      IntType.encodeLong(payload.entries.length),
+    );
+
+    for (final item in payload.entries) {
+      result = Uint8List.fromList([
+        ...result,
+        ...StringType.encodeString(item.key),
+        ...values.encode(item.value),
+      ]);
+    }
+
+    return Uint8List.fromList([
+      ...result,
+      ...IntType.encodeLong(0),
+    ]);
+  }
 }
 
 /// Union avro type
@@ -230,7 +292,7 @@ class UnionType extends AvroType<dynamic> {
     required this.type,
   });
 
-  ///
+  /// Create union from json schema
   factory UnionType.fromJson(Map<String, dynamic> json) {
     final List<dynamic> type = json['type'] as List<dynamic>;
     return UnionType(
@@ -244,5 +306,14 @@ class UnionType extends AvroType<dynamic> {
   @override
   dynamic decode(DataBuffer data) {
     return type[data.readLong()].decode(data);
+  }
+
+  @override
+  Uint8List encode(dynamic payload) {
+    final int typeIndex = type.indexWhere((t) => t.isType(payload));
+    return Uint8List.fromList([
+      ...IntType.encodeLong(typeIndex),
+      ...type[typeIndex].encode(payload),
+    ]);
   }
 }

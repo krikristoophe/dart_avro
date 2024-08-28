@@ -1,6 +1,6 @@
 name: dart_avro
-description: "Flutter wrapper for avro"
-version: 0.0.2
+description: Pure dart implementation of apache avro encoding and decoding
+version: 0.0.3
 homepage: https://github.com/krikristoophe/dart_avro
 
 environment:
